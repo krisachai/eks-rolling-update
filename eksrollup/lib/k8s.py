@@ -20,7 +20,12 @@ def get_k8s_nodes(exclude_node_label_keys=app_config["EXCLUDE_NODE_LABEL_KEYS"])
         except config.ConfigException:
             raise Exception("Could not configure kubernetes python client")
 
-    k8s_api = client.CoreV1Api()
+    configuration = client.Configuration()
+    if app_config['HTTPS_PROXY']:
+        configuration.proxy = app_config['HTTPS_PROXY']
+        logger.info("Set Proxy to {}".format(app_config['HTTPS_PROXY']))
+
+    k8s_api = client.CoreV1Api(client.ApiClient(configuration))
     logger.info("Getting k8s nodes...")
     response = k8s_api.list_node()
     if exclude_node_label_keys is not None:
@@ -65,6 +70,9 @@ def modify_k8s_autoscaler(action):
 
     # Configure API key authorization: BearerToken
     configuration = client.Configuration()
+    if app_config['HTTPS_PROXY']:
+        configuration.proxy = app_config['HTTPS_PROXY']
+        logger.info("Set Proxy to {}".format(app_config['HTTPS_PROXY']))
     # create an instance of the API class
     k8s_api = client.AppsV1Api(client.ApiClient(configuration))
     if action == 'pause':
@@ -102,6 +110,9 @@ def delete_node(node_name):
             raise Exception("Could not configure kubernetes python client")
 
     configuration = client.Configuration()
+    if app_config['HTTPS_PROXY']:
+        configuration.proxy = app_config['HTTPS_PROXY']
+        logger.info("Set Proxy to {}".format(app_config['HTTPS_PROXY']))
     # create an instance of the API class
     k8s_api = client.CoreV1Api(client.ApiClient(configuration))
     logger.info("Deleting k8s node {}...".format(node_name))
@@ -129,6 +140,9 @@ def cordon_node(node_name):
             raise Exception("Could not configure kubernetes python client")
 
     configuration = client.Configuration()
+    if app_config['HTTPS_PROXY']:
+        configuration.proxy = app_config['HTTPS_PROXY']
+        logger.info("Set Proxy to {}".format(app_config['HTTPS_PROXY']))
     # create an instance of the API class
     k8s_api = client.CoreV1Api(client.ApiClient(configuration))
     logger.info("Cordoning k8s node {}...".format(node_name))
@@ -157,6 +171,9 @@ def taint_node(node_name):
             raise Exception("Could not configure kubernetes python client")
 
     configuration = client.Configuration()
+    if app_config['HTTPS_PROXY']:
+        configuration.proxy = app_config['HTTPS_PROXY']
+        logger.info("Set Proxy to {}".format(app_config['HTTPS_PROXY']))
     # create an instance of the API class
     k8s_api = client.CoreV1Api(client.ApiClient(configuration))
     logger.info("Adding taint to k8s node {}...".format(node_name))
